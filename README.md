@@ -17,6 +17,6 @@ Simulation to illustrate how does gene duplication leads to the scale-free prope
 
 ```bash
 bash scripts/run.sh > results.txt
-cat results.txt | awk '(NR==1)||($5>2&&$5<3&&$6<-0.9){print}'
+ cat results.txt | awk '(NR==1)||($5>2&&$5<3&&$6<-0.9){print}' > results-scale-free.txt
  scripts/simulate.py -dp 0.9 -ap 0.001 -cp 0.01 -n 200 --figure figures/dp-0.9-ap-0.001-cp-0.01-n-200.png
 ```
