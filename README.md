@@ -17,11 +17,6 @@ Simulation to illustrate how does gene duplication leads to the scale-free prope
 
 ```bash
 bash scripts/run.sh > results.txt
+cat results.txt | awk '(NR==1)||($5>2&&$5<3&&$6<-0.9){print}'
+ scripts/simulate.py -dp 0.9 -ap 0.001 -cp 0.01 -n 200 --figure figures/dp-0.9-ap-0.001-cp-0.01-n-200.png
 ```
-
-- The following  parameter combination  produce scale free network
-
-  | p(connect) | p(delete) | p(add) | gamma | correlation |
-  | ---- | ---- | ---- | ---- | ---- |
-  | 0.001 | 0.4  | 0.001 | 2.236 | -0.934 |
-  | 0.01	| 0.9	| 0.001 | 2.601 | -0.918 |

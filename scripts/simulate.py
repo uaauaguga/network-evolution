@@ -6,6 +6,7 @@ from scipy.stats import bernoulli
 from matplotlib import pyplot as plt
 from scipy.stats import linregress
 
+np.random.seed(666)
 
 def plot_degree_hist(G,path):
     fig,axes = plt.subplots(1,2,figsize=(8,3))
@@ -16,8 +17,7 @@ def plot_degree_hist(G,path):
     deg,freq = np.unique(degrees,return_counts=True)
     freq = freq[deg>0]
     deg = deg[deg>0]
-    probs = freq/freq.sum()
-    axes[1].scatter(np.log(deg), np.log(probs))
+    axes[1].scatter(np.log(deg), np.log(freq))
     axes[1].set_xlabel("$ln(degree)$",fontsize=12)
     axes[1].set_ylabel("$ln(frequency)$",fontsize=12)
     plt.savefig(path,bbox_inches="tight")
@@ -25,7 +25,8 @@ def plot_degree_hist(G,path):
 
 def simulate(p_connected = 0.01,p_deletion = 0.9,p_addition = 0.001,n_init_nodes = 100,iteration=1000):
     adj_matrix = bernoulli(p_connected).rvs((n_init_nodes,n_init_nodes))
-    adj_matrix = adj_matrix*(1-np.eye(n_init_nodes))
+    adj_matrix = np.triu(adj_matrix,1)
+    adj_matrix = adj_matrix + adj_matrix.T
     G = nx.convert_matrix.from_numpy_matrix(adj_matrix)
     for t in range(iteration):
         # n: current index of node to add
@@ -58,9 +59,8 @@ def get_parameter(G):
     deg,freq = np.unique(degrees,return_counts=True)
     freq = freq[deg>0]
     deg = deg[deg>0]
-    probs = freq/freq.sum()
-    slope, intercept, r, p, se = linregress(np.log(deg), np.log(probs))
-    return -slope, r
+    slope, intercept, r, p, se = linregress(np.log(deg), np.log(freq))
+    return -slope, r, p 
 
 
 def main():
@@ -78,10 +78,11 @@ def main():
                  n_init_nodes = args.nodes_number,
                  iteration= args.duplication_events)
     
-    slope, r = get_parameter(G)
+    slope, r, p  = get_parameter(G)
     slope = np.round(slope,3)
+    p = np.round(p,7)
     r = np.round(r,3)
-    print(f"{args.connect_probability}\t{args.delete_probability}\t{args.add_probability}\t{slope}\t{r}")
+    print(f"{args.connect_probability}\t{args.delete_probability}\t{args.add_probability}\t{args.nodes_number}\t{slope}\t{r}\t{p}")
     if args.figure is not None:
         plot_degree_hist(G,args.figure)
 
